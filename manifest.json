@@ -1,0 +1,7 @@
+{
+  "name": "Custom Addressable Effects",
+  "codeowners": ["@encrust-ace"],
+  "documentation": "https://github.com/encrust-ace/esphome-addressable-effects",
+  "requirements": [],
+  "dependencies": ["light"]
+}
