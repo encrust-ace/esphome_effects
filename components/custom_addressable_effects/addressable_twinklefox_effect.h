@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <vector>
+#include <string>
 
 #include "esphome/core/component.h"
 #include "esphome/components/light/light_state.h"
@@ -89,6 +90,20 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   void set_background_color(Color color) { this->background_color_ = color; }
   void set_auto_background(bool auto_bg) { this->auto_background_ = auto_bg; }
   void set_palette(TwinkleFoxPaletteType palette) { this->palette_type_ = palette; }
+  void set_palette(const char *palette) {
+    std::string p(palette);
+    if (p == "party_colors") this->palette_type_ = PALETTE_PARTY_COLORS;
+    else if (p == "ocean_colors") this->palette_type_ = PALETTE_OCEAN_COLORS;
+    else if (p == "lava_colors") this->palette_type_ = PALETTE_LAVA_COLORS;
+    else if (p == "forest_colors") this->palette_type_ = PALETTE_FOREST_COLORS;
+    else if (p == "rainbow_colors") this->palette_type_ = PALETTE_RAINBOW_COLORS;
+    else if (p == "snow_colors") this->palette_type_ = PALETTE_SNOW_COLORS;
+    else if (p == "holly_colors") this->palette_type_ = PALETTE_HOLLY_COLORS;
+    else if (p == "ice_colors") this->palette_type_ = PALETTE_ICE_COLORS;
+    else if (p == "fairy_light") this->palette_type_ = PALETTE_FAIRY_LIGHT;
+    else if (p == "retro_c9") this->palette_type_ = PALETTE_RETRO_C9;
+    else this->palette_type_ = PALETTE_PARTY_COLORS;
+  }
 
  protected:
   uint8_t twinkle_speed_{4};

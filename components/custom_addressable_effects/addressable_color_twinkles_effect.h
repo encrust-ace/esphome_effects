@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
+#include <string>
 #include "esphome/components/light/addressable_light_effect.h"
 
 namespace esphome {
@@ -28,6 +29,18 @@ class AddressableColorTwinklesEffect : public AddressableLightEffect {
   void set_fade_out_speed(uint8_t speed) { fade_out_speed_ = speed; }
   void set_density(uint8_t density) { density_ = density; }
   void set_palette(ColorTwinklesPaletteType palette) { palette_type_ = palette; }
+  void set_palette(const char *palette) {
+    std::string p(palette);
+    if (p == "cloud_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_CLOUD_COLORS;
+    else if (p == "rainbow_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_RAINBOW_COLORS;
+    else if (p == "snow_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_SNOW_COLORS;
+    else if (p == "incandescent") this->palette_type_ = COLOR_TWINKLES_PALETTE_INCANDESCENT;
+    else if (p == "party_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_PARTY_COLORS;
+    else if (p == "ocean_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_OCEAN_COLORS;
+    else if (p == "forest_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_FOREST_COLORS;
+    else if (p == "lava_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_LAVA_COLORS;
+    else this->palette_type_ = COLOR_TWINKLES_PALETTE_RAINBOW_COLORS;
+  }
 
   void start() override {
     auto &it = *this->get_addressable_();
