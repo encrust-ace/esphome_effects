@@ -65,7 +65,7 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
       if (c_brightness >= 32) {
         it[i] = c;
       } else {
-        // Blend between background and twinkle color
+        // Blend twinkle color
         uint8_t blend_amount = c_brightness * 8;
         it[i] = Color(
           ((uint16_t)c.r * blend_amount) >> 8,
