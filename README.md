@@ -102,11 +102,6 @@ LEDs randomly light up and fade like twinkling stars.
 - addressable_stars:
     name: "Stars"
     stars_probability: 10%     # Probability of a new star appearing (default: 10%)
-    color:                     # Star color (uses light color if all zeros)
-      red: 0%
-      green: 0%
-      blue: 0%
-      white: 0%
 ```
 
 ## Compatibility
