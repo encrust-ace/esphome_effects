@@ -30,8 +30,6 @@ light:
           name: "Color Twinkles"
       - addressable_stars:
           name: "Stars"
-      - addressable_christmas:
-          name: "Christmas"
 ```
 
 ## Available Effects
@@ -111,39 +109,6 @@ LEDs randomly light up and fade like twinkling stars.
       white: 0%
 ```
 
-### Christmas
-
-Static alternating red and green pattern, perfect for Christmas decorations.
-
-```yaml
-- addressable_christmas:
-    name: "Christmas"
-    bit_size: 1                # Number of consecutive LEDs per color (default: 1)
-    blank_size: 0              # Number of blank LEDs between colors (default: 0)
-```
-
-#### Examples
-
-```yaml
-# Single LED alternating: R G R G R G
-- addressable_christmas:
-    name: "Christmas Classic"
-    bit_size: 1
-    blank_size: 0
-
-# Two LEDs per color: RR GG RR GG
-- addressable_christmas:
-    name: "Christmas Double"
-    bit_size: 2
-    blank_size: 0
-
-# With spacing: R _ G _ R _ G _
-- addressable_christmas:
-    name: "Christmas Spaced"
-    bit_size: 1
-    blank_size: 1
-```
-
 ## Full Example
 
 ```yaml
@@ -203,9 +168,6 @@ light:
       - addressable_stars:
           name: "Stars"
           stars_probability: 15%
-      - addressable_christmas:
-          name: "Christmas"
-          bit_size: 2
 ```
 
 ## Compatibility
