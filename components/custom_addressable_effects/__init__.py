@@ -11,8 +11,6 @@ from esphome.const import (
     CONF_WHITE,
 )
 
-CONF_COLOR = "color"
-
 CONF_STARS_PROBABILITY = "stars_probability"
 
 # TwinkleFox configuration
@@ -75,30 +73,11 @@ CONFIG_SCHEMA = cv.All(cv.Schema({}))
     "Stars",
     {
         cv.Optional(CONF_STARS_PROBABILITY, default="10%"): cv.percentage,
-        cv.Optional(
-            CONF_COLOR, default={CONF_RED: 0.0,CONF_GREEN: 0.0, CONF_BLUE:0.0},
-        ): cv.Schema(
-            {
-                cv.Optional(CONF_RED, default=0): cv.percentage,
-                cv.Optional(CONF_GREEN, default=0): cv.percentage,
-                cv.Optional(CONF_BLUE, default=0): cv.percentage,
-                cv.Optional(CONF_WHITE, default=0): cv.percentage,
-            }
-           ),
     },
 )
 async def addressable_stars_effect_to_code(config, effect_id):
     var = cg.new_Pvariable(effect_id, config[CONF_NAME])
     cg.add(var.set_stars_probability(config[CONF_STARS_PROBABILITY]))
-    color_conf = config[CONF_COLOR]
-    color = cg.StructInitializer(
-                AddressableColorStarsEffectColor,
-                ("r", int(round(color_conf[CONF_RED] * 255))),
-                ("g", int(round(color_conf[CONF_GREEN] * 255))),
-                ("b", int(round(color_conf[CONF_BLUE] * 255))),
-                ("w", int(round(color_conf[CONF_WHITE] * 255))),
-            )
-    cg.add(var.set_color(color))
     return var
 
 @register_addressable_effect(
@@ -111,15 +90,6 @@ async def addressable_stars_effect_to_code(config, effect_id):
         cv.Optional(CONF_COOL_LIKE_INCANDESCENT, default=True): cv.boolean,
         cv.Optional(CONF_AUTO_BACKGROUND, default=False): cv.boolean,
         cv.Optional(CONF_PALETTE, default="party_colors"): cv.templatable(cv.string),
-        cv.Optional(
-            CONF_COLOR, default={CONF_RED: 0.0, CONF_GREEN: 0.0, CONF_BLUE: 0.0},
-        ): cv.Schema(
-            {
-                cv.Optional(CONF_RED, default=0): cv.percentage,
-                cv.Optional(CONF_GREEN, default=0): cv.percentage,
-                cv.Optional(CONF_BLUE, default=0): cv.percentage,
-            }
-        ),
     },
 )
 async def addressable_twinklefox_effect_to_code(config, effect_id):
@@ -132,11 +102,6 @@ async def addressable_twinklefox_effect_to_code(config, effect_id):
         cg.add(var.set_palette(TWINKLEFOX_PALETTES[config[CONF_PALETTE].lower()]))
     else:
         cg.add(var.set_palette(config[CONF_PALETTE]))
-    color_conf = config[CONF_COLOR]
-    r = int(round(color_conf[CONF_RED] * 255))
-    g = int(round(color_conf[CONF_GREEN] * 255))
-    b = int(round(color_conf[CONF_BLUE] * 255))
-    cg.add(var.set_background_color(cg.RawExpression(f"Color({r}, {g}, {b})")))
     return var
 
 
