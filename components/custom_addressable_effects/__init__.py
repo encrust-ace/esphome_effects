@@ -14,8 +14,6 @@ from esphome.const import (
 CONF_COLOR = "color"
 
 CONF_STARS_PROBABILITY = "stars_probability"
-CONF_CHRISTMASS_BIT_SIZE = "bit_size"
-CONF_CHRISTMASS_BLANK_SIZE = "blank_size"
 
 # TwinkleFox configuration
 CONF_TWINKLE_SPEED = "twinkle_speed"
@@ -37,7 +35,6 @@ AddressableStarsEffect = light_ns.class_("AddressableStarsEffect", AddressableLi
 ColorStruct = cg.esphome_ns.struct("Color")
 AddressableColorStarsEffectColor = light_ns.struct("AddressableColorStarsEffectColor")
 
-AddressableChristmasEffect = light_ns.class_("AddressableChristmasEffect", AddressableLightEffect)
 AddressableTwinkleFoxEffect = light_ns.class_("AddressableTwinkleFoxEffect", AddressableLightEffect)
 AddressableColorTwinklesEffect = light_ns.class_("AddressableColorTwinklesEffect", AddressableLightEffect)
 
@@ -102,22 +99,6 @@ async def addressable_stars_effect_to_code(config, effect_id):
                 ("w", int(round(color_conf[CONF_WHITE] * 255))),
             )
     cg.add(var.set_color(color))
-    return var
-
-@register_addressable_effect(
-    "addressable_christmas",
-    AddressableChristmasEffect,
-    "Christmas",
-    {
-        cv.Optional(CONF_CHRISTMASS_BIT_SIZE, default="1"): cv.uint8_t,
-        cv.Optional(CONF_CHRISTMASS_BLANK_SIZE, default="0"): cv.uint8_t,
-    },
-
-)
-async def addressable_christmas_effect_to_code(config, effect_id):
-    var = cg.new_Pvariable(effect_id, config[CONF_NAME])
-    cg.add(var.set_bit_size(config[CONF_CHRISTMASS_BIT_SIZE]))
-    cg.add(var.set_blank_size(config[CONF_CHRISTMASS_BLANK_SIZE]))
     return var
 
 @register_addressable_effect(
