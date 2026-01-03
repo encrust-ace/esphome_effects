@@ -13,6 +13,8 @@
 namespace esphome {
 namespace light {
 
+static const char *TAG = "twinklefox_effect";
+
 // Simplified palette structure for ESPHome (16 entries)
 struct TwinkleFoxPaletteEntry {
   uint8_t index;
@@ -84,7 +86,7 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   void set_palette(TwinkleFoxPaletteType palette) { this->palette_type_ = palette; }
   void set_palette(const char *palette) {
     std::string p(palette);
-    ESP_LOGD("set_palette received: %s", p.c_str());
+    ESP_LOGD(TAG, "set_palette received: %s", p.c_str());
     if (p == "party_colors") this->palette_type_ = PALETTE_PARTY_COLORS;
     else if (p == "ocean_colors") this->palette_type_ = PALETTE_OCEAN_COLORS;
     else if (p == "lava_colors") this->palette_type_ = PALETTE_LAVA_COLORS;
