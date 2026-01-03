@@ -110,7 +110,7 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   Color palette_[16];
 
   void setup_palette() {
-    ESP_LOGD(TAG, "set_palette received 1: %s", palette_type_.c_str());
+    ESP_LOGD(TAG, "set_palette received 1: %s", this->palette_type_);
     switch (this->palette_type_) {
       case PALETTE_PARTY_COLORS:
         this->set_party_palette();
