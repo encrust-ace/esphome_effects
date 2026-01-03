@@ -83,8 +83,8 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   void set_cool_like_incandescent(bool cool) { this->cool_like_incandescent_ = cool; }
   void set_palette(TwinkleFoxPaletteType palette) { this->palette_type_ = palette; }
   void set_palette(const char *palette) {
-    ESP_LOGD("set_palette received: %s", palette);
     std::string p(palette);
+    ESP_LOGD("set_palette received: %s", p);
     if (p == "party_colors") this->palette_type_ = PALETTE_PARTY_COLORS;
     else if (p == "ocean_colors") this->palette_type_ = PALETTE_OCEAN_COLORS;
     else if (p == "lava_colors") this->palette_type_ = PALETTE_LAVA_COLORS;
