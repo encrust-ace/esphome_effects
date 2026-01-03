@@ -13,7 +13,7 @@
 namespace esphome {
 namespace light {
 
-static const char *TAG = "twinklefox_effect";
+static const char *const TAG = "twinklefox_effect";
 
 // Simplified palette structure for ESPHome (16 entries)
 struct TwinkleFoxPaletteEntry {
