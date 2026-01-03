@@ -3,11 +3,13 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <functional>
 
 #include "esphome/core/component.h"
 #include "esphome/components/light/light_state.h"
 #include "esphome/components/light/addressable_light.h"
 #include "esphome/components/light/addressable_light_effect.h"
+#include "esphome/components/select/select.h"
 
 namespace esphome {
 namespace light {
@@ -44,6 +46,19 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
 
   void apply(AddressableLight &it, const Color &current_color) override {
     const uint32_t now = millis();
+
+    if (this->palette_func_) {
+      if (now - this->last_palette_check_ > 1000) {
+        this->last_palette_check_ = now;
+        std::string p = this->palette_func_();
+        TwinkleFoxPaletteType old_type = this->palette_type_;
+        this->set_palette(p.c_str());
+        if (this->palette_type_ != old_type) {
+          this->setup_palette();
+        }
+      }
+    }
+
     uint16_t prng16 = 11337;
 
     // Calculate background color
@@ -104,6 +119,10 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
     else if (p == "retro_c9") this->palette_type_ = PALETTE_RETRO_C9;
     else this->palette_type_ = PALETTE_PARTY_COLORS;
   }
+  void set_palette(std::function<std::string()> func) { this->palette_func_ = func; }
+  void set_palette(esphome::select::Select *select) {
+    this->palette_func_ = [select]() { return select->state; };
+  }
 
  protected:
   uint8_t twinkle_speed_{4};
@@ -112,6 +131,8 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   bool auto_background_{false};
   Color background_color_{Color::BLACK};
   TwinkleFoxPaletteType palette_type_{PALETTE_PARTY_COLORS};
+  std::function<std::string()> palette_func_{nullptr};
+  uint32_t last_palette_check_{0};
   
   // Current palette (16 RGB entries)
   Color palette_[16];

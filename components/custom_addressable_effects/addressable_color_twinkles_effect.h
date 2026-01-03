@@ -3,7 +3,9 @@
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
 #include <string>
+#include <functional>
 #include "esphome/components/light/addressable_light_effect.h"
+#include "esphome/components/select/select.h"
 
 namespace esphome {
 namespace light {
@@ -40,6 +42,10 @@ class AddressableColorTwinklesEffect : public AddressableLightEffect {
     else if (p == "forest_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_FOREST_COLORS;
     else if (p == "lava_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_LAVA_COLORS;
     else this->palette_type_ = COLOR_TWINKLES_PALETTE_RAINBOW_COLORS;
+  }
+  void set_palette(std::function<std::string()> func) { this->palette_func_ = func; }
+  void set_palette(esphome::select::Select *select) {
+    this->palette_func_ = [select]() { return select->state; };
   }
 
   void start() override {
@@ -80,6 +86,18 @@ class AddressableColorTwinklesEffect : public AddressableLightEffect {
   void apply(AddressableLight &it, const Color &current_color) override {
     const uint32_t now = millis();
     
+    if (this->palette_func_) {
+      if (now - this->last_palette_check_ > 1000) {
+        this->last_palette_check_ = now;
+        std::string p = this->palette_func_();
+        ColorTwinklesPaletteType old_type = this->palette_type_;
+        this->set_palette(p.c_str());
+        if (this->palette_type_ != old_type) {
+          this->setup_palette();
+        }
+      }
+    }
+
     // Only update every ~40ms for smooth animation
     if (now - last_update_ < 40) {
       return;
@@ -347,6 +365,8 @@ class AddressableColorTwinklesEffect : public AddressableLightEffect {
   uint8_t fade_out_speed_{4};
   uint8_t density_{80};
   ColorTwinklesPaletteType palette_type_{COLOR_TWINKLES_PALETTE_RAINBOW_COLORS};
+  std::function<std::string()> palette_func_{nullptr};
+  uint32_t last_palette_check_{0};
   
   uint8_t *direction_flags_{nullptr};
   size_t direction_flags_size_{0};
