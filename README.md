@@ -45,11 +45,6 @@ A twinkling effect inspired by the FastLED TwinkleFox pattern. LEDs randomly twi
     twinkle_speed: 4           # Speed of twinkle animation (1-8, default: 4)
     twinkle_density: 5         # How many LEDs twinkle at once (1-8, default: 5)
     cool_like_incandescent: true  # Fade to warm colors like incandescent bulbs (default: true)
-    auto_background: false     # Automatically set background from palette (default: false)
-    color:                     # Background color (when auto_background is false)
-      red: 0%
-      green: 0%
-      blue: 0%
 ```
 
 #### Available Palettes
@@ -102,11 +97,6 @@ LEDs randomly light up and fade like twinkling stars.
 - addressable_stars:
     name: "Stars"
     stars_probability: 10%     # Probability of a new star appearing (default: 10%)
-    color:                     # Star color (uses light color if all zeros)
-      red: 0%
-      green: 0%
-      blue: 0%
-      white: 0%
 ```
 
 ## Compatibility

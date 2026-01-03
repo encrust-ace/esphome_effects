@@ -17,7 +17,6 @@ CONF_STARS_PROBABILITY = "stars_probability"
 CONF_TWINKLE_SPEED = "twinkle_speed"
 CONF_TWINKLE_DENSITY = "twinkle_density"
 CONF_COOL_LIKE_INCANDESCENT = "cool_like_incandescent"
-CONF_AUTO_BACKGROUND = "auto_background"
 CONF_PALETTE = "palette"
 
 # ColorTwinkles configuration
@@ -88,7 +87,6 @@ async def addressable_stars_effect_to_code(config, effect_id):
         cv.Optional(CONF_TWINKLE_SPEED, default=4): cv.int_range(min=1, max=8),
         cv.Optional(CONF_TWINKLE_DENSITY, default=5): cv.int_range(min=1, max=8),
         cv.Optional(CONF_COOL_LIKE_INCANDESCENT, default=True): cv.boolean,
-        cv.Optional(CONF_AUTO_BACKGROUND, default=False): cv.boolean,
         cv.Optional(CONF_PALETTE, default="party_colors"): cv.templatable(cv.string),
     },
 )
@@ -97,7 +95,6 @@ async def addressable_twinklefox_effect_to_code(config, effect_id):
     cg.add(var.set_twinkle_speed(config[CONF_TWINKLE_SPEED]))
     cg.add(var.set_twinkle_density(config[CONF_TWINKLE_DENSITY]))
     cg.add(var.set_cool_like_incandescent(config[CONF_COOL_LIKE_INCANDESCENT]))
-    cg.add(var.set_auto_background(config[CONF_AUTO_BACKGROUND]))
     if isinstance(config[CONF_PALETTE], str) and config[CONF_PALETTE].lower() in TWINKLEFOX_PALETTES:
         cg.add(var.set_palette(TWINKLEFOX_PALETTES[config[CONF_PALETTE].lower()]))
     else:

@@ -46,10 +46,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
     const uint32_t now = millis();
     uint16_t prng16 = 11337;
 
-    // Calculate background color
-    Color bg = this->calculate_background();
-    uint8_t background_brightness = (bg.r + bg.g + bg.b) / 3;
-
     for (int i = 0; i < it.size(); i++) {
       // Generate pseudo-random values for this pixel
       prng16 = (uint16_t)(prng16 * 2053) + 1384;
@@ -65,20 +61,17 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
       Color c = this->compute_one_twinkle(pixel_clock, salt);
       
       uint8_t c_brightness = (c.r + c.g + c.b) / 3;
-      int16_t delta_bright = c_brightness - background_brightness;
 
-      if (delta_bright >= 32 || (bg.r == 0 && bg.g == 0 && bg.b == 0)) {
+      if (c_brightness >= 32) {
         it[i] = c;
-      } else if (delta_bright > 0) {
-        // Blend between background and twinkle color
-        uint8_t blend_amount = delta_bright * 8;
-        it[i] = Color(
-          ((uint16_t)bg.r * (255 - blend_amount) + (uint16_t)c.r * blend_amount) >> 8,
-          ((uint16_t)bg.g * (255 - blend_amount) + (uint16_t)c.g * blend_amount) >> 8,
-          ((uint16_t)bg.b * (255 - blend_amount) + (uint16_t)c.b * blend_amount) >> 8
-        );
       } else {
-        it[i] = bg;
+        // Blend twinkle color
+        uint8_t blend_amount = c_brightness * 8;
+        it[i] = Color(
+          ((uint16_t)c.r * blend_amount) >> 8,
+          ((uint16_t)c.g * blend_amount) >> 8,
+          ((uint16_t)c.b * blend_amount) >> 8
+        );
       }
     }
     it.schedule_show();
@@ -87,8 +80,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   void set_twinkle_speed(uint8_t speed) { this->twinkle_speed_ = speed; }
   void set_twinkle_density(uint8_t density) { this->twinkle_density_ = density; }
   void set_cool_like_incandescent(bool cool) { this->cool_like_incandescent_ = cool; }
-  void set_background_color(Color color) { this->background_color_ = color; }
-  void set_auto_background(bool auto_bg) { this->auto_background_ = auto_bg; }
   void set_palette(TwinkleFoxPaletteType palette) { this->palette_type_ = palette; }
   void set_palette(const char *palette) {
     std::string p(palette);
@@ -109,8 +100,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
   uint8_t twinkle_speed_{4};
   uint8_t twinkle_density_{5};
   bool cool_like_incandescent_{true};
-  bool auto_background_{false};
-  Color background_color_{Color::BLACK};
   TwinkleFoxPaletteType palette_type_{PALETTE_PARTY_COLORS};
   
   // Current palette (16 RGB entries)
@@ -151,24 +140,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
       default:
         this->set_party_palette();
     }
-  }
-
-  Color calculate_background() {
-    if (this->auto_background_ && 
-        this->palette_[0].r == this->palette_[1].r &&
-        this->palette_[0].g == this->palette_[1].g &&
-        this->palette_[0].b == this->palette_[1].b) {
-      Color bg = this->palette_[0];
-      uint8_t bg_light = (bg.r + bg.g + bg.b) / 3;
-      if (bg_light > 64) {
-        return Color(bg.r >> 4, bg.g >> 4, bg.b >> 4);  // Scale to 1/16
-      } else if (bg_light > 16) {
-        return Color(bg.r >> 2, bg.g >> 2, bg.b >> 2);  // Scale to 1/4
-      } else {
-        return Color((bg.r * 86) >> 8, (bg.g * 86) >> 8, (bg.b * 86) >> 8);  // Scale to 1/3
-      }
-    }
-    return this->background_color_;
   }
 
   Color compute_one_twinkle(uint32_t ms, uint8_t salt) {
