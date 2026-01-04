@@ -72,7 +72,7 @@ slowly drifting along the strip).
 - addressable_blends:
     name: "Palette Blends"
     palette: rainbow_colors    # Color palette (see below)
-    cycle_ms: 60000            # Time for the palette phase to complete one full cycle (ms)
+    cycle_s: 20                # Time (seconds) for the palette phase to complete one full cycle (0-20, 0=no move)
     scale: 8                   # How quickly color changes across LEDs (higher = larger bands)
 ```
 

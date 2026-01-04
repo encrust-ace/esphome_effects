@@ -24,7 +24,7 @@ class AddressableBlendsEffect : public AddressableLightEffect {
  public:
   AddressableBlendsEffect(const char *name) : AddressableLightEffect(name) {}
 
-  void set_cycle_ms(uint32_t ms) { cycle_ms_ = ms; }
+  void set_cycle_s(uint8_t s) { cycle_s_ = s; }
   void set_scale(uint16_t scale) { scale_ = scale; }
   void set_palette(ColorTwinklesPaletteType palette) { palette_type_ = palette; }
   void set_palette(const char *palette) {
@@ -53,10 +53,11 @@ class AddressableBlendsEffect : public AddressableLightEffect {
 
     const size_t num_leds = it.size();
 
-    // phase 0-255 over cycle_ms_
+    // phase 0-255 over cycle_s_ (seconds)
     uint8_t phase = 0;
-    if (cycle_ms_ > 0) {
-      phase = (uint32_t)(((uint64_t)(now % cycle_ms_) * 256ULL) / cycle_ms_);
+    if (cycle_s_ > 0) {
+      uint32_t sec = now / 1000U;
+      phase = (uint8_t)(((sec % cycle_s_) * 256ULL) / cycle_s_);
     }
 
     size_t idx = 0;
@@ -260,7 +261,7 @@ class AddressableBlendsEffect : public AddressableLightEffect {
     return Color(rr, gg, bb);
   }
 
-  uint32_t cycle_ms_{60000};
+  uint8_t cycle_s_{20};
   uint16_t scale_{8};
   ColorTwinklesPaletteType palette_type_{COLOR_TWINKLES_PALETTE_RAINBOW_COLORS};
   uint32_t last_update_{0};

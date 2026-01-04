@@ -19,7 +19,7 @@ CONF_TWINKLE_DENSITY = "twinkle_density"
 CONF_COOL_LIKE_INCANDESCENT = "cool_like_incandescent"
 CONF_PALETTE = "palette"
 
-CONF_CYCLE_MS = "cycle_ms"
+CONF_CYCLE_S = "cycle_s"
 CONF_SCALE = "scale"
 
 # ColorTwinkles configuration
@@ -110,14 +110,14 @@ async def addressable_twinklefox_effect_to_code(config, effect_id):
     AddressableBlendsEffect,
     "Palette Blends",
     {
-        cv.Optional(CONF_CYCLE_MS, default=60000): cv.positive_time_period_milliseconds,
+        cv.Optional(CONF_CYCLE_S, default=20): cv.int_range(min=0, max=20),
         cv.Optional(CONF_SCALE, default=8): cv.int_range(min=1, max=64),
         cv.Optional(CONF_COLOR_TWINKLES_PALETTE, default="rainbow_colors"): cv.templatable(cv.string),
     },
 )
 async def addressable_blends_effect_to_code(config, effect_id):
     var = cg.new_Pvariable(effect_id, config[CONF_NAME])
-    cg.add(var.set_cycle_ms(config[CONF_CYCLE_MS]))
+    cg.add(var.set_cycle_s(config[CONF_CYCLE_S]))
     cg.add(var.set_scale(config[CONF_SCALE]))
     if isinstance(config[CONF_COLOR_TWINKLES_PALETTE], str) and config[CONF_COLOR_TWINKLES_PALETTE].lower() in COLOR_TWINKLES_PALETTES:
         cg.add(var.set_palette(COLOR_TWINKLES_PALETTES[config[CONF_COLOR_TWINKLES_PALETTE].lower()]))
