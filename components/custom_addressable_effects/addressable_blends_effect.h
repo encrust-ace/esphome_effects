@@ -16,7 +16,6 @@ enum ColorTwinklesPaletteType {
   COLOR_TWINKLES_PALETTE_INCANDESCENT,
   COLOR_TWINKLES_PALETTE_PARTY_COLORS,
   COLOR_TWINKLES_PALETTE_OCEAN_COLORS,
-  COLOR_TWINKLES_PALETTE_FOREST_COLORS,
   COLOR_TWINKLES_PALETTE_LAVA_COLORS,
 };
 
@@ -35,7 +34,6 @@ class AddressableBlendsEffect : public AddressableLightEffect {
     else if (p == "incandescent") this->palette_type_ = COLOR_TWINKLES_PALETTE_INCANDESCENT;
     else if (p == "party_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_PARTY_COLORS;
     else if (p == "ocean_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_OCEAN_COLORS;
-    else if (p == "forest_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_FOREST_COLORS;
     else if (p == "lava_colors") this->palette_type_ = COLOR_TWINKLES_PALETTE_LAVA_COLORS;
     else this->palette_type_ = COLOR_TWINKLES_PALETTE_RAINBOW_COLORS;
   }
@@ -202,26 +200,6 @@ class AddressableBlendsEffect : public AddressableLightEffect {
         palette_[13] = Color(0, 128, 200);
         palette_[14] = Color(0, 64, 200);
         palette_[15] = Color(0, 0, 170);
-        break;
-
-      case COLOR_TWINKLES_PALETTE_FOREST_COLORS:
-        // Forest greens
-        palette_[0] = Color(0, 64, 0);       // Dark green
-        palette_[1] = Color(0, 96, 0);
-        palette_[2] = Color(0, 128, 0);      // Green
-        palette_[3] = Color(32, 160, 0);
-        palette_[4] = Color(64, 192, 0);
-        palette_[5] = Color(96, 200, 32);
-        palette_[6] = Color(64, 192, 0);
-        palette_[7] = Color(32, 160, 0);
-        palette_[8] = Color(0, 128, 0);
-        palette_[9] = Color(0, 96, 32);
-        palette_[10] = Color(0, 64, 0);
-        palette_[11] = Color(32, 80, 0);
-        palette_[12] = Color(64, 96, 0);
-        palette_[13] = Color(32, 80, 0);
-        palette_[14] = Color(0, 64, 16);
-        palette_[15] = Color(0, 80, 0);
         break;
 
       case COLOR_TWINKLES_PALETTE_LAVA_COLORS:

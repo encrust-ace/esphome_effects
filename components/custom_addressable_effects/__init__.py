@@ -62,7 +62,6 @@ COLOR_TWINKLES_PALETTES = {
     "incandescent": ColorTwinklesPaletteType.COLOR_TWINKLES_PALETTE_INCANDESCENT,
     "party_colors": ColorTwinklesPaletteType.COLOR_TWINKLES_PALETTE_PARTY_COLORS,
     "ocean_colors": ColorTwinklesPaletteType.COLOR_TWINKLES_PALETTE_OCEAN_COLORS,
-    "forest_colors": ColorTwinklesPaletteType.COLOR_TWINKLES_PALETTE_FOREST_COLORS,
     "lava_colors": ColorTwinklesPaletteType.COLOR_TWINKLES_PALETTE_LAVA_COLORS,
 }
 

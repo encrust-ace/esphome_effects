@@ -55,7 +55,6 @@ A twinkling effect inspired by the FastLED TwinkleFox pattern. LEDs randomly twi
 | `rainbow_colors` | Full rainbow spectrum |
 | `ocean_colors` | Blues and greens |
 | `lava_colors` | Reds, oranges, and yellows |
-| `forest_colors` | Greens and earth tones |
 | `snow_colors` | Whites and light blues |
 | `holly_colors` | Christmas red and green |
 | `ice_colors` | Cool whites and blues |
@@ -86,7 +85,6 @@ slowly drifting along the strip).
 | `incandescent` | Warm incandescent colors |
 | `party_colors` | Vibrant party colors |
 | `ocean_colors` | Ocean blues and greens |
-| `forest_colors` | Forest greens |
 | `lava_colors` | Lava reds and oranges |
 
 ### Stars

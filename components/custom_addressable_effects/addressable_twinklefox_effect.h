@@ -26,7 +26,6 @@ enum TwinkleFoxPaletteType {
   PALETTE_PARTY_COLORS = 0,
   PALETTE_OCEAN_COLORS,
   PALETTE_LAVA_COLORS,
-  PALETTE_FOREST_COLORS,
   PALETTE_RAINBOW_COLORS,
   PALETTE_SNOW_COLORS,
   PALETTE_HOLLY_COLORS,
@@ -89,7 +88,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
     if (p == "party_colors") this->palette_type_ = PALETTE_PARTY_COLORS;
     else if (p == "ocean_colors") this->palette_type_ = PALETTE_OCEAN_COLORS;
     else if (p == "lava_colors") this->palette_type_ = PALETTE_LAVA_COLORS;
-    else if (p == "forest_colors") this->palette_type_ = PALETTE_FOREST_COLORS;
     else if (p == "rainbow_colors") this->palette_type_ = PALETTE_RAINBOW_COLORS;
     else if (p == "snow_colors") this->palette_type_ = PALETTE_SNOW_COLORS;
     else if (p == "holly_colors") this->palette_type_ = PALETTE_HOLLY_COLORS;
@@ -119,9 +117,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
         break;
       case PALETTE_LAVA_COLORS:
         this->set_lava_palette();
-        break;
-      case PALETTE_FOREST_COLORS:
-        this->set_forest_palette();
         break;
       case PALETTE_RAINBOW_COLORS:
         this->set_rainbow_palette();
@@ -266,15 +261,6 @@ class AddressableTwinkleFoxEffect : public AddressableLightEffect {
     palette_[13] = Color(255, 224, 0);
     palette_[14] = Color(255, 255, 64);
     palette_[15] = Color(255, 255, 255);
-  }
-
-  void set_forest_palette() {
-    for (int i = 0; i < 16; i++) {
-      uint8_t green = 64 + (i * 12);
-      uint8_t red = i * 4;
-      uint8_t blue = i * 2;
-      palette_[i] = Color(red, green, blue);
-    }
   }
 
   void set_rainbow_palette() {
