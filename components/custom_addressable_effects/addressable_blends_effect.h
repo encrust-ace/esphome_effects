@@ -48,22 +48,32 @@ class AddressableBlendsEffect : public AddressableLightEffect {
     const uint32_t now = millis();
 
     // Throttle updates for smooth animation
-    if (now - last_update_ < 30) return;
+    if (now - last_update_ < 20) return;
     last_update_ = now;
 
     const size_t num_leds = it.size();
 
-    // phase 0-255 over cycle_s_ (seconds)
+    // phase 0-255 over cycle_s_ (seconds) using millisecond resolution for smooth movement
     uint8_t phase = 0;
     if (cycle_s_ > 0) {
-      uint32_t sec = now / 1000U;
-      phase = (uint8_t)(((sec % cycle_s_) * 256ULL) / cycle_s_);
+      uint32_t period_ms = (uint32_t)cycle_s_ * 1000U;
+      phase = (uint8_t)(((uint64_t)(now % period_ms) * 256ULL) / period_ms);
     }
+
+    // Blend amount per frame (0-255). Higher = less smooth. Tuned to feel "puffy".
+    const uint8_t blend_amt = 48;
 
     size_t idx = 0;
     for (auto view : it) {
       uint8_t pal_index = ((idx * scale_) + phase) & 0xFF;  // 0-255
-      view = color_from_palette(pal_index, 255);
+      Color target = color_from_palette(pal_index, 255);
+
+      // Blend current pixel toward target for soft, puffy motion
+      Color current = view.get();
+      uint8_t r = (uint16_t(current.r) * (255 - blend_amt) + uint16_t(target.r) * blend_amt) >> 8;
+      uint8_t g = (uint16_t(current.g) * (255 - blend_amt) + uint16_t(target.g) * blend_amt) >> 8;
+      uint8_t b = (uint16_t(current.b) * (255 - blend_amt) + uint16_t(target.b) * blend_amt) >> 8;
+      view = Color(r, g, b);
       idx++;
     }
 
