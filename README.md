@@ -26,8 +26,8 @@ light:
     effects:
       - addressable_twinklefox:
           name: "TwinkleFox"
-      - addressable_color_twinkles:
-          name: "Color Twinkles"
+      - addressable_blends:
+          name: "Palette Blends"
       - addressable_stars:
           name: "Stars"
 ```
@@ -62,18 +62,18 @@ A twinkling effect inspired by the FastLED TwinkleFox pattern. LEDs randomly twi
 | `fairy_light` | Warm white incandescent look |
 | `retro_c9` | Classic C9 Christmas bulb colors |
 
-### Color Twinkles
+### Palette Blends
 
-LEDs twinkle with colors from a selected palette, smoothly fading in and out.
+Slowly blends and moves a chosen palette across the LED strip, interpolating between palette entries
+for very smooth color transitions. This is intended as a slow, ambient effect (think gentle gradients
+slowly drifting along the strip).
 
 ```yaml
-- addressable_color_twinkles:
-    name: "Color Twinkles"
+- addressable_blends:
+    name: "Palette Blends"
     palette: rainbow_colors    # Color palette (see below)
-    starting_brightness: 64    # Initial brightness when a twinkle starts (0-255, default: 64)
-    fade_in_speed: 8           # Speed of fade in (0-255, default: 8)
-    fade_out_speed: 4          # Speed of fade out (0-255, default: 4)
-    density: 80                # Probability of new twinkles (0-255, default: 80)
+    cycle_ms: 60000            # Time for the palette phase to complete one full cycle (ms)
+    scale: 8                   # How quickly color changes across LEDs (higher = larger bands)
 ```
 
 #### Available Palettes

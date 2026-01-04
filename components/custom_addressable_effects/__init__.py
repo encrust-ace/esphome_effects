@@ -19,6 +19,9 @@ CONF_TWINKLE_DENSITY = "twinkle_density"
 CONF_COOL_LIKE_INCANDESCENT = "cool_like_incandescent"
 CONF_PALETTE = "palette"
 
+CONF_CYCLE_MS = "cycle_ms"
+CONF_SCALE = "scale"
+
 # ColorTwinkles configuration
 CONF_STARTING_BRIGHTNESS = "starting_brightness"
 CONF_FADE_IN_SPEED = "fade_in_speed"
@@ -33,7 +36,7 @@ ColorStruct = cg.esphome_ns.struct("Color")
 AddressableColorStarsEffectColor = light_ns.struct("AddressableColorStarsEffectColor")
 
 AddressableTwinkleFoxEffect = light_ns.class_("AddressableTwinkleFoxEffect", AddressableLightEffect)
-AddressableColorTwinklesEffect = light_ns.class_("AddressableColorTwinklesEffect", AddressableLightEffect)
+AddressableBlendsEffect = light_ns.class_("AddressableBlendsEffect", AddressableLightEffect)
 
 # TwinkleFox palette enum
 TwinkleFoxPaletteType = light_ns.enum("TwinkleFoxPaletteType")
@@ -103,23 +106,19 @@ async def addressable_twinklefox_effect_to_code(config, effect_id):
 
 
 @register_addressable_effect(
-    "addressable_color_twinkles",
-    AddressableColorTwinklesEffect,
-    "Color Twinkles",
+    "addressable_blends",
+    AddressableBlendsEffect,
+    "Palette Blends",
     {
-        cv.Optional(CONF_STARTING_BRIGHTNESS, default=64): cv.int_range(min=1, max=255),
-        cv.Optional(CONF_FADE_IN_SPEED, default=32): cv.int_range(min=1, max=255),
-        cv.Optional(CONF_FADE_OUT_SPEED, default=20): cv.int_range(min=1, max=255),
-        cv.Optional(CONF_DENSITY, default=255): cv.int_range(min=1, max=255),
+        cv.Optional(CONF_CYCLE_MS, default=60000): cv.positive_time_period_milliseconds,
+        cv.Optional(CONF_SCALE, default=8): cv.int_range(min=1, max=64),
         cv.Optional(CONF_COLOR_TWINKLES_PALETTE, default="rainbow_colors"): cv.templatable(cv.string),
     },
 )
-async def addressable_color_twinkles_effect_to_code(config, effect_id):
+async def addressable_blends_effect_to_code(config, effect_id):
     var = cg.new_Pvariable(effect_id, config[CONF_NAME])
-    cg.add(var.set_starting_brightness(config[CONF_STARTING_BRIGHTNESS]))
-    cg.add(var.set_fade_in_speed(config[CONF_FADE_IN_SPEED]))
-    cg.add(var.set_fade_out_speed(config[CONF_FADE_OUT_SPEED]))
-    cg.add(var.set_density(config[CONF_DENSITY]))
+    cg.add(var.set_cycle_ms(config[CONF_CYCLE_MS]))
+    cg.add(var.set_scale(config[CONF_SCALE]))
     if isinstance(config[CONF_COLOR_TWINKLES_PALETTE], str) and config[CONF_COLOR_TWINKLES_PALETTE].lower() in COLOR_TWINKLES_PALETTES:
         cg.add(var.set_palette(COLOR_TWINKLES_PALETTES[config[CONF_COLOR_TWINKLES_PALETTE].lower()]))
     else:

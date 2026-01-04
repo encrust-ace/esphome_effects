@@ -20,14 +20,12 @@ enum ColorTwinklesPaletteType {
   COLOR_TWINKLES_PALETTE_LAVA_COLORS,
 };
 
-class AddressableColorTwinklesEffect : public AddressableLightEffect {
+class AddressableBlendsEffect : public AddressableLightEffect {
  public:
-  AddressableColorTwinklesEffect(const char *name) : AddressableLightEffect(name) {}
+  AddressableBlendsEffect(const char *name) : AddressableLightEffect(name) {}
 
-  void set_starting_brightness(uint8_t brightness) { starting_brightness_ = brightness; }
-  void set_fade_in_speed(uint8_t speed) { fade_in_speed_ = speed; }
-  void set_fade_out_speed(uint8_t speed) { fade_out_speed_ = speed; }
-  void set_density(uint8_t density) { density_ = density; }
+  void set_cycle_ms(uint32_t ms) { cycle_ms_ = ms; }
+  void set_scale(uint16_t scale) { scale_ = scale; }
   void set_palette(ColorTwinklesPaletteType palette) { palette_type_ = palette; }
   void set_palette(const char *palette) {
     std::string p(palette);
@@ -42,110 +40,36 @@ class AddressableColorTwinklesEffect : public AddressableLightEffect {
     else this->palette_type_ = COLOR_TWINKLES_PALETTE_RAINBOW_COLORS;
   }
 
-  void start() override {
-    auto &it = *this->get_addressable_();
-    size_t num_leds = it.size();
-    
-    // Allocate direction flags (1 bit per LED, packed into bytes)
-    direction_flags_size_ = (num_leds + 7) / 8;
-    direction_flags_ = new uint8_t[direction_flags_size_];
-    memset(direction_flags_, 0, direction_flags_size_);
-    
-    // Allocate color indices (1 byte per LED for palette index)
-    color_indices_ = new uint8_t[num_leds];
-    memset(color_indices_, 0, num_leds);
-    
-    // Initialize all effect_data to 0 (brightness) and turn off LEDs
-    for (auto view : it) {
-      view.set_effect_data(0);  // brightness = 0
-    }
-    it.all() = Color::BLACK;
-    it.schedule_show();
-    
-    // Setup palette based on type
-    setup_palette();
-  }
+  void start() override { setup_palette(); }
 
-  void stop() override {
-    if (direction_flags_ != nullptr) {
-      delete[] direction_flags_;
-      direction_flags_ = nullptr;
-    }
-    if (color_indices_ != nullptr) {
-      delete[] color_indices_;
-      color_indices_ = nullptr;
-    }
-  }
+  void stop() override {}
 
   void apply(AddressableLight &it, const Color &current_color) override {
     const uint32_t now = millis();
-    
-    // Only update every ~40ms for smooth animation
-    if (now - last_update_ < 40) {
-      return;
-    }
+
+    // Throttle updates for smooth animation
+    if (now - last_update_ < 30) return;
     last_update_ = now;
 
     const size_t num_leds = it.size();
 
-    // Update each pixel brightness and render
-    size_t idx = 0;
-    for (auto view : it) {
-      uint8_t brightness = view.get_effect_data();
-      
-      if (brightness > 0) {
-        if (get_pixel_direction(idx) == GETTING_DARKER) {
-          // Fade down
-          if (brightness > fade_out_speed_) {
-            brightness -= fade_out_speed_;
-          } else {
-            brightness = 0;
-          }
-        } else {
-          // Fade up
-          uint16_t new_bright = brightness + fade_in_speed_;
-          if (new_bright >= 255) {
-            brightness = 255;
-            set_pixel_direction(idx, GETTING_DARKER);  // Start fading down
-          } else {
-            brightness = new_bright;
-          }
-        }
-        
-        view.set_effect_data(brightness);
-        
-        // Render color from palette scaled by brightness
-        if (brightness > 0) {
-          view = color_from_palette(color_indices_[idx], brightness);
-        } else {
-          view = Color::BLACK;
-        }
-      } else {
-        view = Color::BLACK;
-      }
-      
-      idx++;
+    // phase 0-255 over cycle_ms_
+    uint8_t phase = 0;
+    if (cycle_ms_ > 0) {
+      phase = (uint32_t)(((uint64_t)(now % cycle_ms_) * 256ULL) / cycle_ms_);
     }
 
-    // Now consider adding a new random twinkle
-    if ((random_uint32() % 256) < density_) {
-      uint16_t pos = random_uint32() % num_leds;
-      uint8_t brightness = it[pos].get_effect_data();
-      
-      // Only light up if pixel is currently off
-      if (brightness == 0) {
-        color_indices_[pos] = random_uint32() % 256;  // Random palette position
-        it[pos].set_effect_data(starting_brightness_);
-        set_pixel_direction(pos, GETTING_BRIGHTER);
-      }
+    size_t idx = 0;
+    for (auto view : it) {
+      uint8_t pal_index = ((idx * scale_) + phase) & 0xFF;  // 0-255
+      view = color_from_palette(pal_index, 255);
+      idx++;
     }
 
     it.schedule_show();
   }
 
  protected:
-  enum Direction { GETTING_DARKER = 0, GETTING_BRIGHTER = 1 };
-
   void setup_palette() {
     // Setup 16-color palette based on palette type
     switch (palette_type_) {
@@ -312,47 +236,34 @@ class AddressableColorTwinklesEffect : public AddressableLightEffect {
   }
 
   Color color_from_palette(uint8_t index, uint8_t brightness) {
-    uint8_t palette_index = index >> 4;  // 0-15
-    Color c = palette_[palette_index];
-    
-    // Scale by brightness
-    uint8_t r = (c.r * brightness) >> 8;
-    uint8_t g = (c.g * brightness) >> 8;
-    uint8_t b = (c.b * brightness) >> 8;
-    
-    return Color(r, g, b);
+    // Use 16-entry palette and interpolate between adjacent entries for smooth blending.
+    uint8_t idx = index >> 4;          // base index 0-15
+    uint8_t frac = index & 0x0F;       // 0-15 fractional part
+    uint8_t next = (idx == 15) ? 0 : (idx + 1);
+
+    const Color &c1 = palette_[idx];
+    const Color &c2 = palette_[next];
+
+    // Interpolate with 4-bit fraction; scale to 0-16 weight
+    uint8_t w2 = frac;         // 0..15
+    uint8_t w1 = 16 - w2;      // complementary weight
+
+    uint16_t r = (c1.r * w1 + c2.r * w2) >> 4;
+    uint16_t g = (c1.g * w1 + c2.g * w2) >> 4;
+    uint16_t b = (c1.b * w1 + c2.b * w2) >> 4;
+
+    // Apply brightness (0-255)
+    uint8_t rr = (r * brightness) >> 8;
+    uint8_t gg = (g * brightness) >> 8;
+    uint8_t bb = (b * brightness) >> 8;
+
+    return Color(rr, gg, bb);
   }
 
-  bool get_pixel_direction(uint16_t i) {
-    uint16_t index = i / 8;
-    uint8_t bit_num = i & 0x07;
-    uint8_t and_mask = 1 << bit_num;
-    return (direction_flags_[index] & and_mask) != 0;
-  }
-
-  void set_pixel_direction(uint16_t i, Direction dir) {
-    uint16_t index = i / 8;
-    uint8_t bit_num = i & 0x07;
-    uint8_t or_mask = 1 << bit_num;
-    uint8_t and_mask = 255 - or_mask;
-    uint8_t value = direction_flags_[index] & and_mask;
-    if (dir == GETTING_BRIGHTER) {
-      value += or_mask;
-    }
-    direction_flags_[index] = value;
-  }
-
-  uint8_t starting_brightness_{64};
-  uint8_t fade_in_speed_{8};
-  uint8_t fade_out_speed_{4};
-  uint8_t density_{80};
+  uint32_t cycle_ms_{60000};
+  uint16_t scale_{8};
   ColorTwinklesPaletteType palette_type_{COLOR_TWINKLES_PALETTE_RAINBOW_COLORS};
-  
-  uint8_t *direction_flags_{nullptr};
-  size_t direction_flags_size_{0};
-  uint8_t *color_indices_{nullptr};
   uint32_t last_update_{0};
-  
   Color palette_[16];
 };
 
